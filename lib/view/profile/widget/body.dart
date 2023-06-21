@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, sized_box_for_whitespace
 
 import 'package:flutter/material.dart';
+import 'package:sneakers_app/service/auth_service.dart';
 import 'package:sneakers_app/theme/custom_app_theme.dart';
 
 import '../../../../animation/fadeanimation.dart';
@@ -8,6 +9,7 @@ import '../../../../models/models.dart';
 import '../../../../utils/constants.dart';
 import '../../../../view/profile/widget/repeated_list.dart';
 import '../../../data/dummy_data.dart';
+import '../../../pages/auth/login_page.dart';
 
 class BodyProfile extends StatefulWidget {
   const BodyProfile({Key? key}) : super(key: key);
@@ -17,6 +19,8 @@ class BodyProfile extends StatefulWidget {
 }
 
 class _BodyProfileState extends State<BodyProfile> {
+  AuthService authService = AuthService();
+
   int statusCurrentIndex = 0;
   @override
   Widget build(BuildContext context) {
@@ -232,38 +236,50 @@ class _BodyProfileState extends State<BodyProfile> {
                 ),
               ),
             ),
-            RoundedLisTile(
-              width: width,
-              height: height,
-              leadingBackColor: Colors.grey[400],
-              icon: Icons.shield,
-              title: "Privacy",
-              trailing: Container(
-                width: 140,
-                height: 30,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: Colors.red[500],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Action Needed  ",
-                      style: TextStyle(
-                          color: AppConstantsColor.lightTextColor,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      color: AppConstantsColor.lightTextColor,
-                      size: 15,
-                    )
-                  ],
-                ),
+            ListTile(
+              onTap: () async {
+                showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text("Logout"),
+                        content: const Text("Are you sure you want to logout?"),
+                        actions: [
+                          IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: const Icon(
+                              Icons.cancel,
+                              color: Colors.red,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () async {
+                              await authService.signOut();
+                              Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                      builder: (context) => const LoginPage()),
+                                  (route) => false);
+                            },
+                            icon: const Icon(
+                              Icons.done,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
+                      );
+                    });
+              },
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+              leading: const Icon(Icons.exit_to_app),
+              title: const Text(
+                "Logout",
+                style: TextStyle(color: Colors.black),
               ),
-            ),
+            )
           ],
         ),
       ),
